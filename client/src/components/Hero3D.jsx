@@ -32,53 +32,60 @@ export default function Hero3D() {
   }, []);
 
   return (
-    <div ref={containerRef} className="tilt-container relative hero-grid" style={{minWidth:420}}>
+    <div ref={containerRef} className="tilt-container relative hero-grid w-full max-w-[480px] px-4 py-6">
       <div ref={tiltRef} className="tilt">
         <div className="relative flex items-center justify-center">
-          <div className="absolute -right-16 -top-8 z-10">
-            <div className="dashed-ring w-80 h-80 rounded-full" />
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div className="dashed-ring h-[22rem] w-[22rem] opacity-[0.22]" />
           </div>
 
-          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="glass hero-card">
-            <div className="flex items-center justify-between">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="glass hero-card relative z-10 w-full max-w-[420px] rounded-[24px] border border-white/70 bg-white/80 p-6 shadow-[0_18px_50px_rgba(31,42,48,0.10)] backdrop-blur-xl"
+          >
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate/70">Spine & Posture Analysis</p>
-                <p className="mt-1 text-lg font-semibold">Dr. Sana Qureshi, DPT</p>
+                <p className="text-[11px] uppercase tracking-[0.24em] text-slate/70">Treatment snapshot</p>
+                <p className="mt-2 text-lg font-semibold text-slate">Spine & Posture Analysis</p>
+                <p className="mt-2 text-sm leading-6 text-slate/70">Personalized movement and pain assessment with a calm, evidence-led plan.</p>
               </div>
-              <div className="rounded-full bg-white/10 px-3 py-1 text-xs">Active</div>
+              <div className="rounded-full border border-teal/15 bg-teal/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-teal">Active</div>
             </div>
 
-            <div className="mt-6 space-y-4">
-              {['Mobility','Strength','Pain Level'].map((label, i) => (
-                <div key={label}>
-                  <div className="flex justify-between text-sm">
-                    <span>{label}</span>
-                    <span className="text-sm text-slate/60">{[82,67,74][i]}%</span>
+            <div className="mt-6 space-y-3">
+              {[
+                { label: 'Mobility', value: 82, tone: '#008C8A' },
+                { label: 'Strength', value: 67, tone: '#FF6F61' },
+                { label: 'Pain Level', value: 74, tone: '#008C8A' }
+              ].map((item) => (
+                <div key={item.label} className="rounded-[16px] border border-slate/5 bg-white/80 p-3">
+                  <div className="flex items-center justify-between gap-4 text-sm text-slate">
+                    <span>{item.label}</span>
+                    <span className="font-semibold text-slate/70">{item.value}%</span>
                   </div>
-                  <div className="bg-white/10 rounded-full mt-2">
-                    <div style={{ width: `${[82,67,74][i]}%` }} className={`progress ${i===2? 'bg-teal':'bg-coral'}`} />
+                  <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-mist">
+                    <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.tone }} />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-4 flex items-center gap-2 text-sm">
-              <div className="h-8 w-8 rounded-full bg-teal/80" />
-              <div className="text-xs text-slate/70">3 specialists on case</div>
+            <div className="mt-6 border-t border-slate/10 pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate">3 specialists on case</p>
+                  <p className="mt-1 text-sm text-slate/60">Guided support from assessment to recovery</p>
+                </div>
+                <div className="rounded-full bg-mist px-3 py-2 text-sm font-semibold text-slate">Progress</div>
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-[16px] border border-teal/10 bg-teal/5 px-4 py-3 text-sm text-slate/70">
+              <span className="mr-3 inline-flex h-2.5 w-2.5 rounded-full bg-teal" />
+              Now accepting new patients in Islamabad
             </div>
           </motion.div>
-
-          <div className="absolute right-6 top-24 grid gap-6">
-            <div className="w-12 h-12 rounded-2xl bg-white p-3 shadow-soft float-1">💀</div>
-            <div className="w-12 h-12 rounded-2xl bg-white p-3 shadow-soft float-2">🏅</div>
-            <div className="w-12 h-12 rounded-2xl bg-white p-3 shadow-soft float-3">✨</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute right-6 bottom-6">
-        <div className="inline-flex items-center gap-3 rounded-full bg-white/80 px-4 py-2 text-sm font-medium">
-          <span className="h-2 w-2 rounded-full bg-teal animate-pulse" /> Now accepting new patients in Islamabad
         </div>
       </div>
     </div>
