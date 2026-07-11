@@ -146,13 +146,44 @@ img {
 }
 
 .dashed-ring {
-  border: 2px dashed rgba(0, 140, 138, 0.14);
+  border: 2px dashed rgba(0, 140, 138, 0.18);
   animation: spin 12s linear infinite;
+}
+
+.shimmer-text {
+  position: relative;
+  display: inline-block;
+  color: #008C8A;
+  overflow: hidden;
+}
+
+.shimmer-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 10px;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,111,97,0.38) 30%, rgba(255,111,97,0.7) 50%, rgba(255,111,97,0.38) 70%, transparent 100%);
+  background-size: 200% 100%;
+  opacity: 0.9;
+  border-radius: 999px;
+  animation: shimmer 2.8s linear infinite;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
   }
 }
 

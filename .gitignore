@@ -2,6 +2,8 @@
 .DS_Store
 /build
 /dist
+/client/dist/
+/brain.md
 /.env
 .env*
 npm-debug.log*

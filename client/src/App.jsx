@@ -438,7 +438,7 @@ function HomePage() {
         <div className="relative">
           <div className="absolute -left-5 top-0 h-32 w-32 rounded-full bg-teal/10 blur-3xl" />
           <p className="inline-flex rounded-full border border-teal/20 bg-white/80 px-3 py-2 text-sm font-medium text-teal shadow-sm">Private clinic • Islamabad G-9/3</p>
-          <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate sm:text-5xl lg:text-6xl">Get back to pain-free movement with calm, expert care.</h1>
+          <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate sm:text-5xl lg:text-6xl">Get back to <span className="shimmer-text">pain-free</span> movement with calm, expert care.</h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate/70">Aurora Wellness Physiotherapy offers trusted treatment for back pain, knee injury recovery, shoulder rehab, and post-surgery rebuilding in a boutique clinic setting.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#appointment" className="btn-primary">Book an Appointment</a>
