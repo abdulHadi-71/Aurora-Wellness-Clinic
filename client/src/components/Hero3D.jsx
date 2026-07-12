@@ -48,19 +48,19 @@ function SparkleIcon() {
 
 function RatingBadge() {
   return (
-    <div className="flex items-center justify-center gap-1 text-sm font-semibold text-slate">
-      <span>4.9</span>
-      <span className="text-[10px] text-[#FF6F61]">★</span>
+    <div className="flex items-center gap-2 rounded-full border border-white/80 bg-white/90 px-3 py-2 text-[11px] font-semibold text-slate shadow-[0_10px_26px_rgba(31,42,48,0.10)] backdrop-blur-md">
+      <span className="text-[10px] tracking-[0.24em] text-[#FF6F61]">★★★★★</span>
+      <span className="whitespace-nowrap">Life-changing care!</span>
     </div>
   );
 }
 
 const floatingIcons = [
-  { type: 'bone', label: 'Bone', className: 'left-0 top-12', initial: { y: 0, x: 0 }, animate: { y: [0, -8, 0], rotate: [0, -4, 0] } },
-  { type: 'heart', label: 'Heart', className: 'right-2 top-14', initial: { y: 0, x: 0 }, animate: { y: [0, 10, 0], rotate: [0, 4, 0] } },
-  { type: 'stethoscope', label: 'Stethoscope', className: 'left-4 bottom-10', initial: { y: 0, x: 0 }, animate: { y: [0, -10, 0], rotate: [0, 2, 0] } },
-  { type: 'rating', label: 'Rating', className: 'right-2 bottom-14', initial: { y: 0, x: 0 }, animate: { y: [0, 8, 0], rotate: [0, -3, 0] } },
-  { type: 'sparkle', label: 'Sparkles', className: 'right-10 top-28', initial: { y: 0, x: 0 }, animate: { y: [0, -12, 0], rotate: [0, 2.5, 0] } }
+  { type: 'bone', label: 'Bone', className: 'hidden lg:flex -left-4 top-6', initial: { y: 0, x: 0 }, animate: { y: [0, -8, 0], rotate: [0, -4, 0] } },
+  { type: 'heart', label: 'Heart', className: 'hidden lg:flex -right-4 bottom-4', initial: { y: 0, x: 0 }, animate: { y: [0, 10, 0], rotate: [0, 4, 0] } },
+  { type: 'stethoscope', label: 'Stethoscope', className: 'hidden lg:flex -left-4 bottom-20', initial: { y: 0, x: 0 }, animate: { y: [0, -10, 0], rotate: [0, 2, 0] } },
+  { type: 'rating', label: 'Rating', className: 'hidden lg:flex right-2 -top-2', initial: { y: 0, x: 0 }, animate: { y: [0, 8, 0], rotate: [0, -3, 0] } },
+  { type: 'sparkle', label: 'Sparkles', className: 'hidden lg:flex right-0 top-28', initial: { y: 0, x: 0 }, animate: { y: [0, -12, 0], rotate: [0, 2.5, 0] } }
 ];
 
 function FloatingSceneIcon({ type, className, index }) {
@@ -72,12 +72,14 @@ function FloatingSceneIcon({ type, className, index }) {
     sparkle: <SparkleIcon />
   };
 
+  const isRating = type === 'rating';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: [0, -8, 0], rotate: [0, -3, 0] }}
       transition={{ delay: index * 0.08, duration: 3.4, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
-      className={`absolute ${className} z-20 flex h-16 w-16 items-center justify-center rounded-[18px] border border-white/70 bg-white/85 text-teal shadow-[0_10px_26px_rgba(31,42,48,0.10)] backdrop-blur-md`}
+      className={`absolute ${className} z-20 pointer-events-none flex items-center justify-center rounded-[18px] border border-white/70 bg-white/85 text-teal shadow-[0_10px_26px_rgba(31,42,48,0.10)] backdrop-blur-md ${isRating ? 'h-auto w-auto rounded-full px-3 py-2' : 'h-16 w-16'}`}
     >
       {iconMap[type]}
     </motion.div>
@@ -123,7 +125,7 @@ export default function Hero3D() {
   }, []);
 
   return (
-    <div ref={containerRef} className="tilt-container relative hero-grid w-full max-w-[500px] overflow-hidden px-4 py-8">
+    <div ref={containerRef} className="tilt-container relative hero-grid w-full max-w-[640px] overflow-visible px-3 py-8 sm:px-4 lg:max-w-[700px]">
       <motion.div
         className="absolute left-6 top-8 h-24 w-24 rounded-full bg-[rgba(0,140,138,0.16)] blur-3xl"
         style={{ transform: `translateY(${scrollY * 0.05}px)` }}
@@ -133,15 +135,15 @@ export default function Hero3D() {
         style={{ transform: `translateY(${scrollY * 0.08}px)` }}
       />
 
-      <div ref={tiltRef} className="tilt relative flex items-center justify-center">
+      <div ref={tiltRef} className="tilt relative flex items-center justify-center pt-2 pb-1">
         <div className="absolute inset-0 z-0 flex items-center justify-center">
-          <div className="dashed-ring h-[22rem] w-[22rem] opacity-[0.22]" />
+          <div className="dashed-ring h-[22rem] w-[22rem] opacity-[0.22] lg:h-[24rem] lg:w-[24rem]" />
         </div>
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="glass hero-card relative z-10 w-full max-w-[420px] rounded-[24px] border border-white/70 bg-white/80 p-6 shadow-[0_18px_50px_rgba(31,42,48,0.10)] backdrop-blur-xl"
+          className="glass hero-card relative z-10 w-full max-w-[380px] rounded-[24px] border border-white/70 bg-white/80 p-6 shadow-[0_18px_50px_rgba(31,42,48,0.10)] backdrop-blur-xl"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -178,17 +180,13 @@ export default function Hero3D() {
 
           <div className="mt-5 rounded-[16px] border border-teal/10 bg-teal/5 px-4 py-3 text-sm text-slate/70">
             <span className="mr-3 inline-flex h-2.5 w-2.5 rounded-full bg-teal" />
-            Now accepting new patients in Islamabad
+            Guided support from assessment to recovery
           </div>
         </motion.div>
 
         {floatingIcons.map((item, index) => (
           <FloatingSceneIcon key={item.label} type={item.type} className={item.className} index={index} />
         ))}
-
-        <div className="absolute -bottom-2 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/70 bg-white/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate/70 shadow-soft">
-          Scroll down
-        </div>
       </div>
     </div>
   );
