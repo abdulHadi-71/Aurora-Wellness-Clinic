@@ -1,8 +1,56 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link, NavLink, Route, Routes, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import Hero3D from './components/Hero3D';
+
+/* ─── Animated Counter Hook ─── */
+function useCountUp(target, duration = 2000, startOnMount = true) {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const ref = useRef(null);
+
+  const startCount = useCallback(() => {
+    if (hasStarted) return;
+    setHasStarted(true);
+    const startTime = performance.now();
+    const tick = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration, hasStarted]);
+
+  useEffect(() => {
+    if (!startOnMount) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) startCount();
+      },
+      { threshold: 0.3 }
+    );
+    const el = ref.current;
+    if (el) observer.observe(el);
+    return () => { if (el) observer.unobserve(el); };
+  }, [startCount, startOnMount]);
+
+  return { count, ref };
+}
+
+function AnimatedStat({ target, suffix = '', label, valueColor = 'text-teal', labelColor = 'text-slate/60' }) {
+  const { count, ref } = useCountUp(target, 2200);
+  return (
+    <div ref={ref} className="hero-stat flex flex-col items-center text-center">
+      <p className={`text-[2rem] font-bold leading-none sm:text-[2.4rem] ${valueColor}`}>
+        {count.toLocaleString()}{suffix}
+      </p>
+      <p className={`mt-1 text-sm ${labelColor}`}>{label}</p>
+    </div>
+  );
+}
 
 const services = [
   {
@@ -145,6 +193,7 @@ const articles = [
     readingTime: '4 min read',
     date: 'Jul 2, 2026',
     imageClass: 'from-[#e7f4f3] via-[#f7fbfb] to-[#dfeeea]',
+    imageSrc: '/articles/posture.svg',
     excerpt: 'Small posture shifts can make a big difference when pain is linked to long hours at a desk.',
     content: ['Posture is rarely about “standing straight” alone.', 'The goal is balance, supported breathing, and awareness of how you move during the day.']
   },
@@ -156,6 +205,7 @@ const articles = [
     readingTime: '6 min read',
     date: 'Jun 24, 2026',
     imageClass: 'from-[#fff3ef] via-[#fef8f5] to-[#f8dfd8]',
+    imageSrc: '/articles/knee-rehab.svg',
     excerpt: 'Progressive rehab helps build trust in the joint before full activity resumes.',
     content: ['Return to sport should feel like a progression, not a leap.', 'We focus on strength, control, confidence, and pain response at each step.']
   },
@@ -167,6 +217,7 @@ const articles = [
     readingTime: '2 min read',
     date: 'May 16, 2026',
     imageClass: 'from-[#edf2f2] via-[#f7fbfb] to-[#dfe9e9]',
+    imageSrc: '/articles/clinic-hours.svg',
     excerpt: 'We’ve added more weekday availability for patients seeking earlier booking slots.',
     content: ['New appointments are open from Monday to Saturday.', 'WhatsApp remains the fastest way to request a visit or ask a care question.']
   }
@@ -179,12 +230,12 @@ const faqs = [
 ];
 
 const stats = [
-  { value: '10+', label: 'Years of clinical experience' },
-  { value: '5,000+', label: 'Patients supported' },
-  { value: '92%', label: 'Patient satisfaction' }
+  { target: 10, suffix: '+', label: 'Years Experience' },
+  { target: 5000, suffix: '+', label: 'Patients Helped' },
+  { target: 4.9, suffix: '★', label: 'Patient Rating', isDecimal: true }
 ];
 
-const trustLogos = ['Blue Cross', 'Sehat Card', 'Adamjee', 'EFU'];
+const trustLogos = ['Adamjee Insurance', 'Jubilee Health', 'EFU Health', 'IGI Health', 'Pakistan Physio Assoc.'];
 const packageCards = [
   { title: 'Initial Assessment', price: 'PKR 3,500', description: 'A full movement review, history, and personalised care plan.' },
   { title: 'Follow-Up Session', price: 'PKR 2,500', description: 'Hands-on treatment, progress review, and home exercise guidance.' },
@@ -220,25 +271,36 @@ function Header() {
     <header className={`sticky top-0 z-50 border-b border-white/70 backdrop-blur transition-all ${solid ? 'bg-white/90 shadow-soft' : 'bg-white/70'}`}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8">
         <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#008C8A,#2fb3a9)] font-semibold text-white">AW</div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#008C8A,#2fb3a9)]">
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+              <path d="M12 3L14 9H20L15 13L17 19L12 15L7 19L9 13L4 9H10L12 3Z" fill="white" />
+            </svg>
+          </div>
           <div>
-            <p className="text-base font-semibold text-slate">Aurora Wellness</p>
-            <p className="text-xs text-slate/60">Physiotherapy & Sports Rehab</p>
+            <p className="text-base font-bold text-slate">Aurora</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-teal">Wellness</p>
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-5 text-sm font-medium text-slate/80 lg:flex">
-          <NavLink to="/services" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>Services</NavLink>
-          <NavLink to="/conditions" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>Conditions</NavLink>
-          <NavLink to="/team" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>Team</NavLink>
-          <NavLink to="/pricing" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>Pricing</NavLink>
-          <NavLink to="/about" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>About</NavLink>
-          <NavLink to="/contact" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal')}>Contact</NavLink>
+        <nav className="hidden items-center gap-6 text-sm font-medium text-slate/80 lg:flex">
+          <NavLink to="/services" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal transition-colors')}>Services</NavLink>
+          <NavLink to="/conditions" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal transition-colors')}>Conditions</NavLink>
+          <NavLink to="/team" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal transition-colors')}>Team</NavLink>
+          <NavLink to="/results" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal transition-colors')}>Results</NavLink>
+          <NavLink to="/about" className={({ isActive }) => (isActive ? 'text-teal' : 'hover:text-teal transition-colors')}>About</NavLink>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <a href="tel:+923015558123" className="rounded-full border border-teal/20 bg-white/80 px-3 py-2 text-sm font-semibold text-slate shadow-sm hover:border-teal/40 hover:text-teal">Call</a>
-          <a href="https://wa.me/923015558123" className="rounded-full bg-[#25D366] px-3 py-2 text-sm font-semibold text-white shadow-sm">WhatsApp</a>
+          <a href="tel:+923015558123" className="hidden items-center gap-1.5 text-sm font-medium text-slate/70 hover:text-teal sm:inline-flex">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            +92 301 555 8123
+          </a>
+          <a href="https://wa.me/923015558123" className="rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5">
+            <span className="mr-1">💬</span> WhatsApp
+          </a>
+          <a href="#appointment" className="rounded-full bg-[linear-gradient(135deg,#008C8A,#2fb3a9)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5">
+            Book Now
+          </a>
         </div>
       </div>
     </header>
@@ -257,14 +319,48 @@ function PageShell({ title, description, children, schema }) {
       </Helmet>
       <Header />
       <main id="maincontent">{children}</main>
-      <footer className="border-t border-white/70 bg-white/80 px-6 py-8 text-sm text-slate/70 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 Aurora Wellness Physiotherapy • Private clinic in Islamabad</p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/services" className="hover:text-teal">Services</Link>
-            <Link to="/about" className="hover:text-teal">About</Link>
-            <Link to="/privacy" className="hover:text-teal">Privacy</Link>
-            <Link to="/contact" className="hover:text-teal">Contact</Link>
+      <footer className="bg-[#1a2327] px-6 py-16 text-[15px] text-white lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[2fr_1fr_1.5fr] lg:gap-8">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#008C8A,#2fb3a9)]">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                  <path d="M12 3L14 9H20L15 13L17 19L12 15L7 19L9 13L4 9H10L12 3Z" fill="white" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-base font-bold text-white">Aurora</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-teal">Wellness</p>
+              </div>
+            </div>
+            <p className="mt-6 max-w-sm text-[13px] leading-6 text-white/60">
+              Private physiotherapy &amp; sports rehabilitation clinic in Islamabad. Helping you get back to pain-free movement.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-white">Quick Links</h4>
+            <div className="mt-6 flex flex-col gap-4 text-[13px] text-white/60">
+              <Link to="/services" className="hover:text-teal transition-colors">Services</Link>
+              <Link to="/team" className="hover:text-teal transition-colors">Our Team</Link>
+              <Link to="/results" className="hover:text-teal transition-colors">Results</Link>
+              <Link to="/about" className="hover:text-teal transition-colors">About</Link>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-bold text-white">Contact</h4>
+            <div className="mt-6 flex flex-col gap-4 text-[13px] text-white/60">
+              <p>Shop 12, 1st Floor, Mehran Plaza<br/>G-9/3, Islamabad</p>
+              <a href="tel:+923015558123" className="text-teal hover:text-white transition-colors">+92 301 555 8123</a>
+              <a href="mailto:hello@aurorawellness.pk" className="text-teal hover:text-white transition-colors">hello@aurorawellness.pk</a>
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto mt-16 max-w-7xl border-t border-white/10 pt-8 text-[12px] text-white/40 md:flex md:items-center md:justify-between">
+          <p>© 2026 Aurora Wellness Physiotherapy. All rights reserved.</p>
+          <div className="mt-4 flex gap-6 md:mt-0">
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Notice</Link>
           </div>
         </div>
       </footer>
@@ -272,12 +368,12 @@ function PageShell({ title, description, children, schema }) {
   );
 }
 
-function SectionHeading({ eyebrow, title, copy, align = 'left' }) {
+function SectionHeading({ eyebrow, title, copy, align = 'center' }) {
   return (
     <div className={`max-w-3xl ${align === 'center' ? 'mx-auto text-center' : ''}`}>
-      <p className="text-sm font-semibold uppercase tracking-[0.32em] text-teal">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-semibold text-slate sm:text-4xl">{title}</h2>
-      {copy ? <p className="mt-4 text-lg text-slate/70">{copy}</p> : null}
+      <p className="inline-block rounded-full bg-teal/15 px-4 py-1.5 text-[15px] font-medium text-teal">{eyebrow}</p>
+      <h2 className="mt-5 text-[2.2rem] font-bold leading-tight text-slate sm:text-5xl">{title}</h2>
+      {copy ? <p className="mx-auto mt-4 max-w-2xl text-lg text-slate/70">{copy}</p> : null}
     </div>
   );
 }
@@ -353,24 +449,73 @@ function AppointmentForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="surface-card rounded-[32px] border border-white bg-white p-7 shadow-soft">
-      <h3 className="text-2xl font-semibold text-slate">Request an appointment</h3>
+    <form onSubmit={handleSubmit} className="rounded-[32px] border border-white/60 bg-[#f2f7f7] p-8 shadow-soft lg:p-10">
+      <h3 className="text-xl font-bold text-slate">Request an appointment</h3>
       <div className="mt-6 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <input name="name" aria-label="Full name" required value={formData.name} onChange={handleChange} className="rounded-2xl border border-slate/10 bg-mist/60 px-4 py-3 outline-none ring-0" placeholder="Full name" />
-          <input name="phone" aria-label="Phone number" required value={formData.phone} onChange={handleChange} className="rounded-2xl border border-slate/10 bg-mist/60 px-4 py-3 outline-none ring-0" placeholder="Phone number" />
+          <input name="name" aria-label="Full name" required value={formData.name} onChange={handleChange} className="rounded-[14px] border border-slate/10 bg-white px-4 py-3.5 outline-none ring-0 focus:border-teal" placeholder="Full name" />
+          <input name="phone" aria-label="Phone number" required value={formData.phone} onChange={handleChange} className="rounded-[14px] border border-slate/10 bg-white px-4 py-3.5 outline-none ring-0 focus:border-teal" placeholder="Phone number" />
         </div>
-        <input name="email" aria-label="Email address" type="email" value={formData.email} onChange={handleChange} className="rounded-2xl border border-slate/10 bg-mist/60 px-4 py-3 outline-none ring-0" placeholder="Email address" />
-        <input name="preferredDate" aria-label="Preferred date" value={formData.preferredDate} onChange={handleChange} className="rounded-2xl border border-slate/10 bg-mist/60 px-4 py-3 outline-none ring-0" placeholder="Preferred date / time" />
-        <textarea name="concern" aria-label="Concern" rows="4" value={formData.concern} onChange={handleChange} className="rounded-2xl border border-slate/10 bg-mist/60 px-4 py-3 outline-none ring-0" placeholder="What can we help you with?" />
-        <label className="flex items-start gap-3 text-sm text-slate/70">
-          <input type="checkbox" required checked={formData.consent} onChange={(event) => setFormData((prev) => ({ ...prev, consent: event.target.checked }))} />
+        <input name="email" aria-label="Email address" type="email" value={formData.email} onChange={handleChange} className="rounded-[14px] border border-slate/10 bg-white px-4 py-3.5 outline-none ring-0 focus:border-teal" placeholder="Email address" />
+        <input name="preferredDate" aria-label="Preferred date" value={formData.preferredDate} onChange={handleChange} className="rounded-[14px] border border-slate/10 bg-white px-4 py-3.5 outline-none ring-0 focus:border-teal" placeholder="Preferred date / time" />
+        <textarea name="concern" aria-label="Concern" rows="4" value={formData.concern} onChange={handleChange} className="rounded-[14px] border border-slate/10 bg-white px-4 py-3.5 outline-none ring-0 focus:border-teal" placeholder="What can we help you with?" />
+        <label className="mt-1 flex items-start gap-3 text-[13px] text-slate/70">
+          <input type="checkbox" required checked={formData.consent} onChange={(event) => setFormData((prev) => ({ ...prev, consent: event.target.checked }))} className="mt-0.5 rounded border-slate/20 text-teal focus:ring-teal" />
           <span>I consent to being contacted about my appointment request.</span>
         </label>
-        <button type="submit" className="btn-primary mt-2">Request Appointment</button>
+        <button type="submit" className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#008C8A,#007A78)] px-4 py-3.5 text-sm font-semibold text-white shadow-md hover:opacity-90">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Request Appointment
+        </button>
         {status ? <p className="text-sm text-slate/70">{status}</p> : null}
       </div>
     </form>
+  );
+}
+
+function AppointmentSection() {
+  return (
+    <section id="appointment" className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+      <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-8">
+        <div>
+          <p className="inline-block rounded-full bg-[#dcf1ee] px-4 py-1.5 text-[15px] font-medium text-teal">Visit Us</p>
+          <h2 className="mt-5 text-[2.2rem] font-bold leading-tight text-slate sm:text-5xl">Find us in G-9/3, Islamabad</h2>
+          
+          <div className="mt-10 grid gap-8">
+            <div className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#dcf1ee] text-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <p className="font-semibold text-slate">Address</p>
+                <p className="mt-1 text-slate/70">Shop 12, First Floor, Mehran Plaza, G-9/3, Islamabad</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#dcf1ee] text-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <p className="font-semibold text-slate">Hours</p>
+                <p className="mt-1 text-slate/70">Mon–Sat: 9:00–19:00 | Sun: Closed</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#dcf1ee] text-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <p className="font-semibold text-slate">Phone</p>
+                <p className="mt-1 text-slate/70">+92 301 555 8123</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <AppointmentForm />
+      </div>
+    </section>
   );
 }
 
@@ -399,34 +544,87 @@ function FaqAccordion({ items }) {
   );
 }
 
-function TestimonialSlider({ items }) {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % items.length), 6000);
-    return () => window.clearInterval(timer);
-  }, [items.length]);
-
-  const item = items[activeIndex];
+function PatientResults() {
+  const reviews = [
+    { name: 'Hamza K.', treatment: 'Sports Rehab', initial: 'H', quote: 'I ran 10k again after 6 weeks! The team understood my goals and pushed me just enough.' },
+    { name: 'Rabia A.', treatment: 'Rotator Cuff', initial: 'R', quote: 'Shoulder pain gone; back to work. Genuinely the most caring clinic I have been to.' },
+    { name: 'Adeel S.', treatment: 'Post-Surgery', initial: 'A', quote: 'Professional, caring team. They explained every step and I never felt rushed.' },
+  ];
 
   return (
-    <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-teal">Testimonials</p>
-          <h3 className="mt-2 text-2xl font-semibold text-slate">Warm words from patients and athletes</h3>
+    <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+      <SectionHeading eyebrow="Patient Results" title="Real stories. Real recoveries." align="center" eyebrowClass="bg-[#FF6F61]/15 text-[#FF6F61]" />
+      <div className="mt-14 grid gap-6 md:grid-cols-3">
+        {reviews.map((review) => (
+          <div key={review.name} className="flex flex-col justify-between rounded-[32px] border border-white/80 bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+            <div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-teal/40">
+                <path d="M10 11h-4a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h3v8l-3 5" />
+                <path d="M20 11h-4a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h3v8l-3 5" />
+              </svg>
+              <div className="mt-4 flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg key={star} viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-[#FF6F61]">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="mt-5 text-[15px] leading-7 text-slate/80">“{review.quote}”</p>
+            </div>
+            <div className="mt-8 flex items-center justify-between border-t border-slate/5 pt-6">
+              <div>
+                <p className="font-bold text-slate">{review.name}</p>
+                <p className="text-[12px] font-medium text-teal">{review.treatment}</p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#008C8A,#007A78)] font-bold text-white shadow-sm">
+                {review.initial}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CtaSection() {
+  return (
+    <section className="bg-[linear-gradient(135deg,#008C8A,#007A78)] py-20 text-center text-white sm:py-28">
+      <div className="mx-auto max-w-4xl px-6">
+        <div className="inline-flex items-center gap-2 rounded-full bg-black/10 px-4 py-1.5 text-[13px] font-medium text-white/90">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-[#FF6F61]"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Start your recovery today
         </div>
-        <div className="flex gap-2">
-          {items.map((entry, index) => (
-            <button key={entry.name} type="button" className={`h-2.5 w-2.5 rounded-full ${index === activeIndex ? 'bg-teal' : 'bg-slate/20'}`} onClick={() => setActiveIndex(index)} aria-label={`Show testimonial from ${entry.name}`} />
-          ))}
+        <h2 className="mt-6 text-[2.6rem] font-bold leading-tight sm:text-[3.5rem]">
+          Your first step toward pain-<br className="hidden sm:block"/>free movement starts here.
+        </h2>
+        <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-8 text-white/80">
+          Book your initial assessment with our expert team. Same-week appointments available.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <a href="#appointment" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-teal transition-transform hover:-translate-y-0.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Book an Appointment
+          </a>
+          <a href="https://wa.me/923015558123" className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-sm transition-transform hover:-translate-y-0.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            WhatsApp Us
+          </a>
         </div>
       </div>
-      <motion.div key={item.name} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 rounded-[24px] border border-mist bg-mist/70 p-8">
-        <p className="text-2xl font-semibold text-slate">“{item.quote}”</p>
-        <p className="mt-4 text-sm font-semibold uppercase tracking-[0.24em] text-teal">{item.name}</p>
-        <p className="mt-2 text-sm text-slate/70">{item.treatment}</p>
-      </motion.div>
+    </section>
+  );
+}
+
+function AnimatedDecimalStat({ target, suffix = '', label, valueColor = 'text-teal', labelColor = 'text-slate/60' }) {
+  const { count, ref } = useCountUp(Math.round(target * 10), 2200);
+  const display = (count / 10).toFixed(1);
+  return (
+    <div ref={ref} className="hero-stat flex flex-col items-center text-center">
+      <p className={`text-[2rem] font-bold leading-none sm:text-[2.4rem] ${valueColor}`}>
+        {display}{suffix}
+      </p>
+      <p className={`mt-1 text-sm ${labelColor}`}>{label}</p>
     </div>
   );
 }
@@ -434,46 +632,126 @@ function TestimonialSlider({ items }) {
 function HomePage() {
   return (
     <PageShell title="Home" description="Private physiotherapy and sports rehab clinic in Islamabad G-9/3 with calm, expert-led care." schema={localBusinessSchema}>
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
+      <section className="hero-section relative mx-auto grid max-w-7xl items-center gap-8 px-6 py-14 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-20">
         <div className="relative">
-          <div className="absolute -left-5 top-0 h-32 w-32 rounded-full bg-teal/10 blur-3xl" />
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal/20 bg-white/85 px-3 py-2 text-sm font-medium text-slate shadow-sm">
-            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-teal" />
-            <span>Now accepting new patients in Islamabad</span>
+          <div className="absolute -left-5 top-0 h-36 w-36 rounded-full bg-teal/10 blur-3xl" />
+
+          {/* Accepting patients pulse */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2.5 rounded-full border border-teal/15 bg-white/85 px-4 py-2 text-sm font-medium text-slate shadow-sm backdrop-blur-sm"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-teal" />
+            </span>
+            Now accepting new patients in Islamabad
+          </motion.div>
+
+          {/* Main heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="mt-7 text-[2.6rem] font-semibold leading-[1.12] text-slate sm:text-[3.4rem] lg:text-[3.8rem]"
+          >
+            Get Back<br />to{' '}
+            <span className="shimmer-text">Pain-Free</span>
+            <br />Movement.
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-6 max-w-lg text-[1.05rem] leading-7 text-slate/65"
+          >
+            Expert physiotherapy and sports rehabilitation in G-9/3, Islamabad.
+            Personalized care that helps you move better, recover faster, and
+            live without limits.
+          </motion.p>
+
+          {/* CTA buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.45 }}
+            className="mt-8 flex flex-wrap gap-3"
+          >
+            <a href="#appointment" className="btn-primary">
+              <span className="mr-1">📅</span> Book an Appointment →
+            </a>
+            <a href="https://wa.me/923015558123" className="btn-secondary">
+              <span className="mr-1">💬</span> Chat on WhatsApp
+            </a>
+          </motion.div>
+
+          {/* Animated counters — flat, no card boxes */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="mt-10 flex flex-wrap items-start gap-8 sm:gap-12"
+          >
+            {stats.map((item) =>
+              item.isDecimal ? (
+                <AnimatedDecimalStat
+                  key={item.label}
+                  target={item.target}
+                  suffix={item.suffix}
+                  label={item.label}
+                />
+              ) : (
+                <AnimatedStat
+                  key={item.label}
+                  target={item.target}
+                  suffix={item.suffix}
+                  label={item.label}
+                />
+              )
+            )}
+          </motion.div>
+        </div>
+
+        {/* 3D Hero scene */}
+        <div className="flex items-center justify-center relative">
+          <Hero3D />
+        </div>
+
+        {/* Scroll-down indicator */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-[32px] w-[20px] justify-center rounded-[10px] border-2 border-teal/40 pt-[4px]">
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="h-[4px] w-[2.5px] rounded-full bg-teal"
+              />
+            </div>
           </div>
-          <p className="mt-4 inline-flex rounded-full border border-teal/20 bg-white/80 px-3 py-2 text-sm font-medium text-teal shadow-sm">Private clinic • Islamabad G-9/3</p>
-          <h1 className="mt-6 text-4xl font-semibold leading-tight text-slate sm:text-5xl lg:text-6xl">Get back to <span className="shimmer-text">pain-free</span> movement with calm, expert care.</h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate/70">Aurora Wellness Physiotherapy offers trusted treatment for back pain, knee injury recovery, shoulder rehab, and post-surgery rebuilding in a boutique clinic setting.</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#appointment" className="btn-primary">Book an Appointment</a>
-            <a href="https://wa.me/923015558123" className="btn-secondary">Chat on WhatsApp</a>
-          </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {stats.map((item) => (
-              <div key={item.label} className="surface-card rounded-[24px] border border-white bg-white/80 p-5 shadow-soft">
-                <p className="text-2xl font-semibold text-teal">{item.value}</p>
-                <p className="mt-1 text-sm text-slate/70">{item.label}</p>
-              </div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate/5 bg-white py-10">
+        <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate/40">Trusted by patients & partnered with leading insurers</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 sm:gap-12 text-[15px] font-bold text-slate/50">
+            {trustLogos.map((logo) => (
+              <span key={logo} className="flex items-center gap-2.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                {logo}
+              </span>
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-center">
-          <Hero3D />
-        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
-        <div className="rounded-[32px] border border-white/70 bg-slate px-8 py-7 text-white shadow-soft">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">Trusted by local patients</p>
-          <div className="mt-4 flex flex-wrap gap-4 text-lg font-medium text-white/80">
-            {trustLogos.map((logo) => <span key={logo}>{logo}</span>)}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <SectionHeading eyebrow="Top services" title="Recovery plans tailored to comfort, strength, and confidence." copy="Every plan is personalised, paced, and designed to feel calm and clear from the first session onward." />
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <SectionHeading eyebrow="Our Services" title="Specialized care for every stage of recovery" copy="From your first assessment to full return-to-function, our team builds a plan around you." />
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
           {services.slice(0, 3).map((service) => (
             <motion.article
               key={service.slug}
@@ -502,26 +780,17 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-teal">Before & after</p>
-            <h3 className="mt-2 text-2xl font-semibold text-slate">Care that helps patients move better, not just feel better.</h3>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {[
-                ['Before', 'Pain and stiffness affected daily movement.'],
-                ['After', 'Improved mobility, confidence, and ease of activity.']
-              ].map(([label, text]) => (
-                <div key={label} className="rounded-[24px] border border-mist bg-mist/70 p-5">
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal">{label}</p>
-                  <p className="mt-3 text-sm leading-7 text-slate/70">{text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <TestimonialSlider items={testimonials} />
+      {/* Dark stats band */}
+      <section className="bg-slate py-16 text-white shadow-soft">
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-12 px-6 lg:gap-24 lg:px-8">
+          <AnimatedStat target={10} suffix="+" label="Years Experience" valueColor="text-white" labelColor="text-white/60" />
+          <AnimatedStat target={5000} suffix="+" label="Patients Helped" valueColor="text-white" labelColor="text-white/60" />
+          <AnimatedStat target={92} suffix="%" label="Recovery Rate" valueColor="text-white" labelColor="text-white/60" />
+          <AnimatedDecimalStat target={4.9} suffix="★" label="Patient Rating" valueColor="text-[#FF6F61]" labelColor="text-white/60" />
         </div>
       </section>
+
+      <PatientResults />
 
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <SectionHeading eyebrow="Latest articles" title="Practical guidance for recovery and everyday movement." copy="From post-surgery tips to return-to-sport planning, we share calm, useful resources for patients." />
@@ -534,6 +803,7 @@ function HomePage() {
             >
               <Link to={`/blog/${article.slug}`} className="block">
                 <div className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${article.imageClass}`}>
+                  <img src={article.imageSrc} alt={article.title} className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.8),_transparent_45%)]" />
                   <div className="absolute bottom-4 left-4 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate">{article.category}</div>
                 </div>
@@ -558,18 +828,9 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="rounded-[32px] border border-white/70 bg-[linear-gradient(135deg,#f4f9f9_0%,#e5f4f3_100%)] p-8 shadow-soft lg:flex lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-teal">Book your visit</p>
-            <h3 className="mt-2 text-3xl font-semibold text-slate">Let’s create a care plan you can feel good about.</h3>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3 lg:mt-0">
-            <a href="https://wa.me/923015558123" className="btn-secondary">WhatsApp us</a>
-            <Link to="/contact" className="btn-primary">Contact clinic</Link>
-          </div>
-        </div>
-      </section>
+      <CtaSection />
+      
+      <AppointmentSection />
     </PageShell>
   );
 }
