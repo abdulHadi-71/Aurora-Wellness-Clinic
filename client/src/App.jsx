@@ -1239,48 +1239,148 @@ function BlogPostPage() {
 }
 
 function AboutPage() {
+  const values = [
+    { title: 'Patient-first', copy: 'Every plan starts with listening, clarity, and respect for your day-to-day life.' },
+    { title: 'Evidence-based', copy: 'We use proven rehab principles and practical progression rather than guesswork.' },
+    { title: 'Compassion', copy: 'Recovery feels calmer when the care experience is warm, clear, and encouraging.' },
+    { title: 'Accessibility', copy: 'Convenient evenings, clear communication, and support that feels approachable.' }
+  ];
+
+  const highlights = [
+    { label: 'Years in practice', value: '10+' },
+    { label: 'Patients helped', value: '5,000+' },
+    { label: 'Recovery rate', value: '92%' },
+    { label: 'Expert clinicians', value: '3' },
+    { label: 'Insurance partners', value: '5+' },
+    { label: 'Local clinic', value: 'Islamabad' }
+  ];
+
+  const reasons = [
+    'Personalized care plans built around your specific goals.',
+    'A calm, private clinic environment that supports better recovery.',
+    'Hands-on therapy paired with practical home exercise guidance.',
+    'Trusted local access in Islamabad with streamlined booking support.'
+  ];
+
   return (
     <PageShell title="About the clinic" description="Discover the story behind Aurora Wellness, our values, and the care philosophy that guides every appointment.">
-      <section className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-[1fr_0.95fr] lg:px-8">
-        <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-teal">About Aurora Wellness</p>
-          <h1 className="mt-3 text-4xl font-semibold text-slate">A boutique clinic built around calm care, expert guidance, and patient trust.</h1>
-          <p className="mt-6 text-sm leading-8 text-slate/70">Aurora Wellness Physiotherapy was created to bring a more reassuring, personal experience to physiotherapy in Islamabad. We combine thoughtful assessment with practical rehab, always keeping the patient’s comfort and long-term movement goals in focus.</p>
-        </div>
-        <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-          <img src="/clinic-room.svg" alt="A calm physiotherapy treatment room" className="h-64 w-full rounded-[24px] object-cover" />
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+        <div className="overflow-hidden rounded-[36px] border border-white/80 bg-[linear-gradient(135deg,rgba(0,140,138,0.12),rgba(255,255,255,0.94))] shadow-[0_18px_60px_rgba(31,42,48,0.08)]">
+          <div className="grid gap-0 lg:grid-cols-[1fr_0.95fr]">
+            <div className="p-8 lg:p-12">
+              <p className="inline-flex rounded-full bg-white/90 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.24em] text-teal shadow-sm">About Aurora Wellness</p>
+              <h1 className="mt-5 text-[2.4rem] font-semibold leading-tight text-slate sm:text-[3rem]">Expert care, compassionate healing in Islamabad.</h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate/70">Aurora Wellness Physiotherapy was created to offer a more reassuring, personal experience for recovery—one that brings together skilled treatment, clear guidance, and a calm clinic environment.</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="#appointment" className="btn-primary">Book an appointment</a>
+                <a href="https://wa.me/923015558123" className="btn-secondary">WhatsApp us</a>
+              </div>
+            </div>
+            <div className="bg-slate p-4 lg:p-6">
+              <img src="/clinic-room.svg" alt="A calm physiotherapy treatment room" className="h-full min-h-[320px] w-full rounded-[28px] object-cover" />
+            </div>
+          </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-8 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-[32px] border border-white/80 bg-white p-8 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">Our story</p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate">A boutique clinic built around trust and long-term recovery.</h2>
+            <p className="mt-5 text-sm leading-8 text-slate/70">Aurora Wellness began with a simple idea: patients deserve physiotherapy that feels calm, understandable, and truly supportive. From the first assessment to the final milestone, we focus on creating a treatment experience that reduces stress while building real progress.</p>
+            <p className="mt-4 text-sm leading-8 text-slate/70">Led by Dr. Sana Qureshi, our clinic blends clinical expertise with a patient-centered philosophy—helping people move better, recover with confidence, and return to the routines they value most.</p>
+          </div>
+
+          <div className="rounded-[32px] border border-white/80 bg-[linear-gradient(135deg,rgba(0,140,138,0.08),rgba(255,255,255,0.96))] p-8 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">Our mission</p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate">Make recovery feel clear, human, and achievable.</h2>
+            <p className="mt-5 text-sm leading-8 text-slate/70">We help patients move from pain and uncertainty toward structure, strength, and confidence—through thoughtful treatment plans, practical education, and a clinic environment that feels genuinely supportive.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            ['Years in practice', '10+'],
-            ['Patients helped', '5,000+'],
-            ['Care philosophy', 'Calm, evidence-led, patient-first']
-          ].map(([label, value]) => (
-            <div key={label} className="surface-card rounded-[28px] border border-white bg-white p-7 shadow-soft">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal">{label}</p>
-              <p className="mt-3 text-2xl font-semibold text-slate">{value}</p>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {values.map((value) => (
+            <div key={value.title} className="rounded-[28px] border border-white/80 bg-white p-6 shadow-soft">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-mist text-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2v20M2 12h20" />
+                </svg>
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate">{value.title}</h3>
+              <p className="mt-2 text-sm leading-7 text-slate/70">{value.copy}</p>
             </div>
           ))}
         </div>
       </section>
+
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-            <h2 className="text-2xl font-semibold text-slate">Our values</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-7 text-slate/70">
-              <li>• Calm, reassuring care that never feels clinical or rushed.</li>
-              <li>• Clear exercise plans that patients can actually follow.</li>
-              <li>• Thoughtful progression that respects pain, lifestyle, and recovery stages.</li>
-            </ul>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {highlights.map((item) => (
+            <div key={item.label} className="rounded-[24px] border border-white/80 bg-white p-6 shadow-soft">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">{item.label}</p>
+              <p className="mt-3 text-2xl font-semibold text-slate">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="rounded-[32px] border border-white/80 bg-white p-8 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">Our facility</p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate">A clean, modern clinic environment built for comfort.</h2>
+            <p className="mt-5 text-sm leading-8 text-slate/70">Our clinic space is designed to feel private, tidy, and easy to navigate—so patients can focus on recovery instead of stress. From consultant support to treatment setup, every visit is shaped around a calmer, more reassuring experience.</p>
+            <div className="mt-6 rounded-[24px] border border-mist bg-mist/70 p-5">
+              <p className="text-sm font-semibold text-slate">Location advantages</p>
+              <p className="mt-2 text-sm leading-7 text-slate/70">Conveniently located in Mehran Plaza, G-9/3, Islamabad with a practical, easy-to-reach setup for local families and working professionals.</p>
+            </div>
           </div>
-          <div className="surface-card rounded-[32px] border border-white bg-white p-8 shadow-soft">
-            <h2 className="text-2xl font-semibold text-slate">Facility</h2>
-            <p className="mt-4 text-sm leading-7 text-slate/70">We offer a private, tidy treatment space in Mehran Plaza with a focus on comfort and ease for every visit.</p>
+
+          <div className="rounded-[32px] border border-white/80 bg-white p-8 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">Meet the team</p>
+            <h2 className="mt-3 text-3xl font-semibold text-slate">Clinicians who bring clarity, care, and consistency.</h2>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {team.slice(0, 3).map((member) => (
+                <div key={member.slug} className="rounded-[24px] border border-slate/10 bg-mist/50 p-4">
+                  <div className="h-20 rounded-[18px] bg-[linear-gradient(135deg,rgba(0,140,138,0.14),rgba(255,255,255,0.9))]" />
+                  <p className="mt-4 text-sm font-semibold text-slate">{member.name}</p>
+                  <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.2em] text-teal">{member.title}</p>
+                </div>
+              ))}
+            </div>
+            <Link to="/team" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal">
+              Meet the full team
+              <span>→</span>
+            </Link>
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16 lg:px-8">
+        <div className="rounded-[32px] border border-white/80 bg-white p-8 shadow-soft">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">Why choose us</p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {reasons.map((reason) => (
+              <div key={reason} className="rounded-[22px] border border-slate/10 bg-mist/50 p-4 text-sm leading-7 text-slate/70">{reason}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="rounded-[32px] bg-[linear-gradient(135deg,#008C8A,#007A78)] px-8 py-10 text-center text-white shadow-soft">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">Ready when you are</p>
+          <h2 className="mt-3 text-3xl font-semibold">Start your recovery journey with calm, expert support.</h2>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a href="#appointment" className="btn-secondary bg-white text-slate">Book an appointment</a>
+            <a href="https://wa.me/923015558123" className="btn-secondary border-white/30 bg-[#25D366] text-white">Chat on WhatsApp</a>
+          </div>
+        </div>
+      </section>
+
       <AppointmentSection />
     </PageShell>
   );
