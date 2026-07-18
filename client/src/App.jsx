@@ -839,18 +839,100 @@ function ServicesPage() {
   return (
     <PageShell title="Services" description="Explore our physiotherapy and rehab services for pain relief, movement recovery, and stronger daily function.">
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <SectionHeading eyebrow="Services" title="Care designed for healing, strength, and daily confidence." copy="We blend hands-on treatment, movement coaching, and practical progression plans to create a calm, effective experience." />
-        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="overflow-hidden rounded-[32px] border border-white/80 bg-[linear-gradient(135deg,rgba(0,140,138,0.12),rgba(255,255,255,0.92))] p-8 shadow-[0_18px_60px_rgba(31,42,48,0.08)] lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div>
+              <p className="inline-flex rounded-full bg-white/85 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.24em] text-teal shadow-sm">Our services</p>
+              <h1 className="mt-5 text-[2.4rem] font-semibold leading-tight text-slate sm:text-[3rem]">Care designed for healing, strength, and daily confidence.</h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate/70">We blend hands-on treatment, movement coaching, and practical progression plans to help you recover with clarity, comfort, and measurable momentum.</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                {['Personalized plans', 'Evidence-led rehab', 'Same-week support'].map((item) => (
+                  <span key={item} className="rounded-full border border-teal/15 bg-white/80 px-3 py-2 text-sm font-medium text-slate shadow-sm">{item}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                { title: 'Assessment', copy: 'A calm movement review and tailored care path.' },
+                { title: 'Rehab', copy: 'Structured strength, mobility, and confidence work.' },
+                { title: 'Progress', copy: 'Clear milestones that support long-term recovery.' }
+              ].map((item) => (
+                <div key={item.title} className="rounded-[24px] border border-white/80 bg-white/90 p-5 shadow-soft">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal">{item.title}</p>
+                  <p className="mt-2 text-sm leading-7 text-slate/70">{item.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {services.map((service) => (
-            <article key={service.slug} className="surface-card rounded-[28px] border border-white bg-white p-8 shadow-soft">
-              <div className="text-3xl">{service.icon}</div>
-              <h3 className="mt-4 text-2xl font-semibold text-slate">{service.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate/70">{service.excerpt}</p>
-              <Link to={`/services/${service.slug}`} className="mt-5 inline-flex text-sm font-semibold text-teal">Learn more →</Link>
-            </article>
+            <motion.article
+              key={service.slug}
+              whileHover={{ y: -4, scale: 1.01, boxShadow: '0 24px 60px rgba(31, 42, 48, 0.12)' }}
+              className="group relative overflow-hidden rounded-[28px] border border-white/80 bg-white/95 p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
+            >
+              <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(135deg,rgba(0,140,138,0.10),rgba(255,111,97,0.04))]" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mist text-teal transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-teal group-hover:text-white">
+                    <ServiceIcon type={service.icon} />
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] ${service.tagClass}`}>{service.tag}</span>
+                </div>
+
+                <h3 className="mt-6 text-[1.45rem] font-semibold text-slate">{service.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate/70">{service.excerpt}</p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {service.meta.map((item) => (
+                    <span key={item} className="rounded-full bg-mist px-2.5 py-1 text-[11px] font-medium text-slate/70">{item}</span>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-[20px] border border-slate/10 bg-mist/60 p-4">
+                  <p className="text-sm font-semibold text-slate">What to expect</p>
+                  <p className="mt-2 text-sm leading-7 text-slate/70">{service.description}</p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between gap-4 border-t border-slate/10 pt-4">
+                  <span className="text-sm text-slate/60">Designed for comfort and recovery</span>
+                  <Link to={`/services/${service.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-teal">
+                    Explore
+                    <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </Link>
+                </div>
+              </div>
+            </motion.article>
           ))}
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="rounded-[30px] border border-white/80 bg-slate px-7 py-8 text-white shadow-soft">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">Recovery journey</p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">A clear path from discomfort to confidence.</h2>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                { title: '1. Assess', copy: 'Understand the cause and set realistic targets.' },
+                { title: '2. Treat', copy: 'Restore strength, mobility, and control.' },
+                { title: '3. Return', copy: 'Build confidence for everyday life and sport.' }
+              ].map((step) => (
+                <div key={step.title} className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#FF6F61]">{step.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/75">{step.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <AppointmentSection />
     </PageShell>
   );
